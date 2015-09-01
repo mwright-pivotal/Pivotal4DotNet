@@ -47,7 +47,7 @@ namespace MyRESTService
             }
             Console.WriteLine("Retrieved service instance information for " + connectionStringName);
 
-            var connectionString = cfServiceInstance["credentials"]["connection"].Value<string>();
+            var connectionString = cfServiceInstance["credentials"]["uri"].Value<string>();
             Console.WriteLine("Replacing connection string information for " + connectionStringName + " with VCAP_SERVICES value of " + connectionString);
 
             return connectionString;

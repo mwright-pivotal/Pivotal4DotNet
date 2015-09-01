@@ -15,6 +15,7 @@ namespace MyRESTService
     {
         public List<Product> GetProductList()
         {
+            this.getChannel();
             return Products.Instance.ProductList;
         }
 
@@ -25,7 +26,10 @@ namespace MyRESTService
 
         public RabbitMQ.Client.IModel getChannel()
         {
-            var factory = new ConnectionFactory() { HostName = "localhost" };
+            var rmqConnect = PCFHelper.Bind("p-rabbitmq", "java-dotnet-messaging");
+            System.Diagnostics.Debug.WriteLine("Using " + rmqConnect);
+            var factory = new ConnectionFactory();
+            factory.Uri = rmqConnect;
             var connection = factory.CreateConnection();
             return connection.CreateModel();
         }
