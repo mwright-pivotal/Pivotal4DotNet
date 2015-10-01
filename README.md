@@ -9,7 +9,7 @@ The application has 3 service dependencies:<br>
 <br>
 (all Pivotal led open-source projects)
 <br>
-TODO: Setup Instructions
+TODO: Setup Instructions<br>
 1. Publish app from VS to C:\Temp<br>
 2. C:\Temp\MyRestService>cf push p4dotnet -m 2g -s windows2012R2 -b https://github.com/ryandotsmith/null-buildpack.git --no-
 start -p .<br>
