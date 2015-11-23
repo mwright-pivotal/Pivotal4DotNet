@@ -6,6 +6,7 @@ using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.Text;
 using RabbitMQ.Client;
+using GemStone.GemFire.Cache.Generic;
 
 namespace MyRESTService
 {
@@ -16,7 +17,22 @@ namespace MyRESTService
         public List<Product> GetProductList()
         {
             this.getChannel();
-            return Products.Instance.ProductList;
+            List<Product> products = null;
+            IRegion<int, string> productRegion = this.getProductRegion();
+
+            if (productRegion.Count == 0)
+            {
+                products = Products.Instance.ProductList;
+                for (int p = 0; p < products.Count; p++)
+                {
+                    productRegion.Add(products[p].ProductId, products[p].Name);
+                }
+            } else
+            {
+                products = (List<Product>)productRegion.Values;
+            }
+
+            return products;
         }
 
         public void SendMessage(String msg)
@@ -32,6 +48,23 @@ namespace MyRESTService
             factory.Uri = rmqConnect;
             var connection = factory.CreateConnection();
             return connection.CreateModel();
+        }
+
+        public Cache getCache()
+        {
+            CacheFactory cacheFactory = CacheFactory.CreateCacheFactory();
+            cacheFactory.AddLocator("192.168.0.100", 10334);
+            Cache cache = cacheFactory.SetSubscriptionEnabled(true).Create();
+
+            return cache;
+        }
+
+        public IRegion<int,string> getProductRegion()
+        {
+            Cache cache = this.getCache();
+            RegionFactory regionFactory = cache.CreateRegionFactory(RegionShortcut.CACHING_PROXY);
+            IRegion<int, string> r = regionFactory.Create<int, string>("products");
+            return r;
         }
     }
 }
